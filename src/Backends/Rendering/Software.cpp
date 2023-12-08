@@ -35,7 +35,7 @@ static RenderBackend_GlyphAtlas *glyph_atlas;
 static RenderBackend_Surface *glyph_destination_surface;
 static unsigned char glyph_colour_channels[3];
 
-RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, bool fullscreen)
+RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t screen_width, size_t screen_height, int fullscreen)
 {
 	if (WindowBackend_Software_CreateWindow(window_title, screen_width, screen_height, fullscreen))
 	{
@@ -71,7 +71,7 @@ void RenderBackend_DrawScreen(void)
 	framebuffer.pixels = WindowBackend_Software_GetFramebuffer(&framebuffer.pitch);
 }
 
-RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, bool render_target)
+RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, int render_target)
 {
 	(void)render_target;
 
@@ -107,11 +107,11 @@ void RenderBackend_FreeSurface(RenderBackend_Surface *surface)
 	free(surface);
 }
 
-bool RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
+int RenderBackend_IsSurfaceLost(RenderBackend_Surface *surface)
 {
 	(void)surface;
 
-	return false;
+	return 0;
 }
 
 void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
@@ -142,7 +142,7 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 #endif
 }
 
-ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, bool colour_key)
+ATTRIBUTE_HOT void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, int colour_key)
 {
 	RenderBackend_Rect rect_clamped;
 

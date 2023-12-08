@@ -105,7 +105,7 @@ BOOL OrgDataNoteAlloc(unsigned short note_num);	// 指定の数だけNoteDataの
 void OrgDataReleaseNote(void);	// NoteDataを開放 (Release NoteData)
 BOOL OrgDataInitMusicData(const char *path);
 void OrgDataPlayData(void);
-void OrgDataSetPlayPointer(long x);	// 再生ポインターを指定の位置に設定 (Set playback pointer to specified position)
+void SetPlayPointer(long x);	// 再生ポインターを指定の位置に設定 (Set playback pointer to specified position)
 
 AudioBackend_Sound *lpORGANBUFFER[8][8][2] = {NULL};
 
@@ -781,7 +781,7 @@ void OrgDataPlayData(void)
 	}
 }
 
-void OrgDataSetPlayPointer(long x)
+void SetPlayPointer(long x)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
@@ -833,7 +833,7 @@ void SetOrganyaPosition(unsigned int x)
 	if (!audio_backend_initialised)
 		return;
 
-	OrgDataSetPlayPointer(x);
+	SetPlayPointer(x);
 	Volume = 100;
 	bFadeout = FALSE;
 }
