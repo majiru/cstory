@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -33,8 +32,8 @@
 void InactiveWindow(void);
 void ActiveWindow(void);
 
-std::string gModulePath;
-std::string gDataPath;
+char *gModulePath;
+char *gDataPath;
 
 BOOL bFullscreen;
 BOOL gbUseJoystick = FALSE;
@@ -58,7 +57,7 @@ static void DragAndDropCallback(const char *path)
 	LoadProfile(path);
 }
 
-static void WindowFocusCallback(bool focus)
+static void WindowFocusCallback(BOOL focus)
 {
 	if (focus)
 		ActiveWindow();
@@ -116,19 +115,6 @@ int main(int argc, char *argv[])
 	// Get executable's path, and path of the data folder
 	if (!Backend_GetPaths(&gModulePath, &gDataPath))
 	{
-		// Fall back on argv[0] if the backend cannot provide a path
-		gModulePath = argv[0];
-
-		for (size_t i = gModulePath.length();; --i)
-		{
-			if (i == 0 || gModulePath[i] == '\\' || gModulePath[i] == '/')
-			{
-				gModulePath.resize(i);
-				break;
-			}
-		}
-
-		gDataPath = gModulePath + "/data";
 	}
 
 	CONFIGDATA conf;
@@ -406,7 +392,7 @@ void JoystickProc(void);
 
 BOOL SystemTask(void)
 {
-	static bool previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	static BOOL previous_keyboard_state[BACKEND_KEYBOARD_TOTAL];
 
 	do
 	{
@@ -417,7 +403,7 @@ BOOL SystemTask(void)
 		}
 	} while(!bActive);
 
-	bool keyboard_state[BACKEND_KEYBOARD_TOTAL];
+	BOOL keyboard_state[BACKEND_KEYBOARD_TOTAL];
 	Backend_GetKeyboardState(keyboard_state);
 
 	for (unsigned int i = 0; i < BACKEND_KEYBOARD_TOTAL; ++i)

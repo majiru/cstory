@@ -7,13 +7,13 @@
 
 typedef struct AudioBackend_Sound AudioBackend_Sound;
 
-bool AudioBackend_Init(void);
+int AudioBackend_Init(void);
 void AudioBackend_Deinit(void);
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length);
 void AudioBackend_DestroySound(AudioBackend_Sound *sound);
 
-void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping);
+void AudioBackend_PlaySound(AudioBackend_Sound *sound, int looping);
 void AudioBackend_StopSound(AudioBackend_Sound *sound);
 void AudioBackend_RewindSound(AudioBackend_Sound *sound);
 

@@ -11,6 +11,7 @@
 
 #include "NpChar.h"
 
+typedef struct NPC_TBL_RECT NPC_TBL_RECT;
 struct NPC_TBL_RECT
 {
 	unsigned char front;
@@ -19,6 +20,7 @@ struct NPC_TBL_RECT
 	unsigned char bottom;
 };
 
+typedef struct NPC_TABLE NPC_TABLE;
 struct NPC_TABLE
 {
 	unsigned short bits;

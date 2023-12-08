@@ -9,7 +9,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -451,16 +450,16 @@ BOOL SaveTimeCounter(void)
 	unsigned char p[4];
 	REC rec;
 	FILE *fp;
-	std::string path;
+	char path[128];
 
 	// Quit if player doesn't have the Nikumaru Counter
 	if (!(gMC.equip & EQUIP_NIKUMARU_COUNTER))
 		return TRUE;
 
 	// Get last time
-	path = gModulePath + "/290.rec";
+	snprint(path, sizeof path, "%s/290.rec", gModulePath);
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp != NULL)
 	{
 		// Read data
@@ -500,7 +499,7 @@ BOOL SaveTimeCounter(void)
 		rec.counter[i] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 	}
 
-	fp = fopen(path.c_str(), "wb");
+	fp = fopen(path, "wb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -523,12 +522,12 @@ int LoadTimeCounter(void)
 	unsigned char p[4];
 	REC rec;
 	FILE *fp;
-	std::string path;
+	char path[128];
 
 	// Open file
-	path = gModulePath + "/290.rec";
+	snprint(path, sizeof path, "%s/290.rec", gModulePath);
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return 0;
 

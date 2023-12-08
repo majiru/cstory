@@ -3,6 +3,6 @@
 
 #pragma once
 
-bool ControllerBackend_Init(void);
+int ControllerBackend_Init(void);
 void ControllerBackend_Deinit(void);
-bool ControllerBackend_GetJoystickStatus(bool **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count);
+int ControllerBackend_GetJoystickStatus(int **buttons, unsigned int *button_count, short **axes, unsigned int *axis_count);

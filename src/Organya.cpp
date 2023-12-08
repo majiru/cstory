@@ -43,8 +43,9 @@
 #define SETWAVE		0x00000020
 #define SETPIPI		0x00000040
 
+typedef struct NOTELIST NOTELIST;
 // Below are Organya song data structures
-typedef struct NOTELIST
+struct NOTELIST
 {
 	NOTELIST *from;	// Previous address
 	NOTELIST *to;	// Next address
@@ -54,7 +55,7 @@ typedef struct NOTELIST
 	unsigned char y;	// Sound height
 	unsigned char volume;	// Volume
 	unsigned char pan;
-} NOTELIST;
+};
 
 // Track data * 8
 typedef struct TRACKDATA
@@ -82,25 +83,29 @@ typedef struct MUSICINFO
 // メインクラス。このアプリケーションの中心。（クラスってやつを初めて使う） (Main class. The heart of this application. (Class is used for the first time))
 typedef struct OrgData
 {
-	OrgData();	// コンストラクタ (Constructor)
+//	OrgData();	// コンストラクタ (Constructor)
 //	~OrgData();	// デストラクタ (Destructor)
 	MUSICINFO info;
 	char track;
 	char mute[MAXTRACK];
 	unsigned char def_pan;
 	unsigned char def_volume;
-	void InitOrgData(void);
-	void GetMusicInfo(MUSICINFO *mi);	// 曲情報を取得 (Get song information)
+
 	// 曲情報を設定。flagは設定アイテムを指定 (Set song information. flag specifies the setting item)
-	BOOL SetMusicInfo(MUSICINFO *mi,unsigned long flag);
-	BOOL NoteAlloc(unsigned short note_num);	// 指定の数だけNoteDataの領域を確保 (Allocate the specified number of NoteData areas.)
-	void ReleaseNote(void);	// NoteDataを開放 (Release NoteData)
+
 	// 以下は再生 (The following is playback)
-	void PlayData(void);
-	void SetPlayPointer(long x);	// 再生ポインターを指定の位置に設定 (Set playback pointer to specified position)
 	// 以下はファイル関係 (The following are related to files)
-	BOOL InitMusicData(const char *path);
 } ORGDATA;
+
+void OrgDataOrgData();
+void OrgDataInitOrgData(void);
+void OrgDataGetMusicInfo(MUSICINFO *mi);	// 曲情報を取得 (Get song information)
+BOOL OrgDataSetMusicInfo(MUSICINFO *mi,unsigned long flag);
+BOOL OrgDataNoteAlloc(unsigned short note_num);	// 指定の数だけNoteDataの領域を確保 (Allocate the specified number of NoteData areas.)
+void OrgDataReleaseNote(void);	// NoteDataを開放 (Release NoteData)
+BOOL OrgDataInitMusicData(const char *path);
+void OrgDataPlayData(void);
+void OrgDataSetPlayPointer(long x);	// 再生ポインターを指定の位置に設定 (Set playback pointer to specified position)
 
 AudioBackend_Sound *lpORGANBUFFER[8][8][2] = {NULL};
 
@@ -407,108 +412,108 @@ ORGDATA org_data;
 
 static void OrganyaCallback(void)
 {
-	org_data.PlayData();
+	OrgDataPlayData();
 }
 
-OrgData::OrgData(void)
+void OrgDataOrgData(void)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		info.tdata[i].note_list = NULL;
-		info.tdata[i].note_p = NULL;
+		org_data.info.tdata[i].note_list = NULL;
+		org_data.info.tdata[i].note_p = NULL;
 	}
 }
 
-void OrgData::InitOrgData(void)
+void OrgDataInitOrgData(void)
 {
-	track = 0;
-	info.alloc_note = ALLOCNOTE;	// とりあえず10000個確保 (For the time being, secure 10,000 pieces)
-	info.dot = 4;
-	info.line = 4;
-	info.wait = 128;
-	info.repeat_x = info.dot * info.line * 0;
-	info.end_x = info.dot * info.line * 255;
+	org_data.track = 0;
+	org_data.info.alloc_note = ALLOCNOTE;	// とりあえず10000個確保 (For the time being, secure 10,000 pieces)
+	org_data.info.dot = 4;
+	org_data.info.line = 4;
+	org_data.info.wait = 128;
+	org_data.info.repeat_x = org_data.info.dot * org_data.info.line * 0;
+	org_data.info.end_x = org_data.info.dot * org_data.info.line * 255;
 
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		info.tdata[i].freq = 1000;
-		info.tdata[i].wave_no = 0;
-		info.tdata[i].pipi = 0;
+		org_data.info.tdata[i].freq = 1000;
+		org_data.info.tdata[i].wave_no = 0;
+		org_data.info.tdata[i].pipi = 0;
 	}
 
-	NoteAlloc(info.alloc_note);
-	SetMusicInfo(&info, SETALL);
+	OrgDataNoteAlloc(org_data.info.alloc_note);
+	OrgDataSetMusicInfo(&org_data.info, SETALL);
 
-	def_pan = DEFPAN;
-	def_volume = DEFVOLUME;
+	org_data.def_pan = DEFPAN;
+	org_data.def_volume = DEFVOLUME;
 }
 
 // 曲情報を設定。flagはアイテムを指定 (Set song information. flag specifies an item)
-BOOL OrgData::SetMusicInfo(MUSICINFO *mi, unsigned long flag)
+BOOL OrgDataSetMusicInfo(MUSICINFO *mi, unsigned long flag)
 {
 	//char str[32];	// Leftover debug junk
 	int i;
 
 	if (flag & SETGRID)	// グリッドを有効に (Enable grid)
 	{
-		info.dot = mi->dot;
-		info.line = mi->line;
+		org_data.info.dot = mi->dot;
+		org_data.info.line = mi->line;
 	}
 
 	if (flag & SETWAIT)
 	{
-		info.wait = mi->wait;
+		org_data.info.wait = mi->wait;
 		//itoa(mi->wait, str, 10);	// Leftover debug junk
 	}
 
 	if (flag & SETREPEAT)
 	{
-		info.repeat_x = mi->repeat_x;
-		info.end_x = mi->end_x;
+		org_data.info.repeat_x = mi->repeat_x;
+		org_data.info.end_x = mi->end_x;
 	}
 
 	if (flag & SETFREQ)
 	{
 		for (i = 0; i < MAXMELODY; i++)
 		{
-			info.tdata[i].freq = mi->tdata[i].freq;
-			info.tdata[i].pipi = info.tdata[i].pipi;	 // Just sets info.tdata[i].pipi to itself (SETPIPI already sets pipi, so maybe this line shouldn't be here in the first place)
+			org_data.info.tdata[i].freq = mi->tdata[i].freq;
+			org_data.info.tdata[i].pipi = org_data.info.tdata[i].pipi;	 // Just sets info.tdata[i].pipi to itself (SETPIPI already sets pipi, so maybe this line shouldn't be here in the first place)
 		}
 	}
 
 	if (flag & SETWAVE)
 		for (i = 0; i < MAXTRACK; i++)
-			info.tdata[i].wave_no = mi->tdata[i].wave_no;
+			org_data.info.tdata[i].wave_no = mi->tdata[i].wave_no;
 
 	if (flag & SETPIPI)
 		for (i = 0; i < MAXTRACK; i++)
-			info.tdata[i].pipi = mi->tdata[i].pipi;
+			org_data.info.tdata[i].pipi = mi->tdata[i].pipi;
 
 	return TRUE;
 }
 
 // 指定の数だけNoteDataの領域を確保(初期化) (Allocate the specified number of NoteData areas (initialization))
-BOOL OrgData::NoteAlloc(unsigned short alloc)
+BOOL OrgDataNoteAlloc(unsigned short alloc)
 {
 	int i,j;
 
 	for (j = 0; j < MAXTRACK; j++)
 	{
-		info.tdata[j].wave_no = 0;
-		info.tdata[j].note_list = NULL;	// コンストラクタにやらせたい (I want the constructor to do it)
-		info.tdata[j].note_p = (NOTELIST*)malloc(sizeof(NOTELIST) * alloc);
+		org_data.info.tdata[j].wave_no = 0;
+		org_data.info.tdata[j].note_list = NULL;	// コンストラクタにやらせたい (I want the constructor to do it)
+		org_data.info.tdata[j].note_p = (NOTELIST*)malloc(sizeof(NOTELIST) * alloc);
 
-		if (info.tdata[j].note_p == NULL)
+		if (org_data.info.tdata[j].note_p == NULL)
 		{
 			for (i = 0; i < MAXTRACK; i++)
 			{
-				if (info.tdata[i].note_p != NULL)
+				if (org_data.info.tdata[i].note_p != NULL)
 				{
-					free(info.tdata[i].note_p);
+					free(org_data.info.tdata[i].note_p);
 				#ifdef FIX_BUGS
-					info.tdata[i].note_p = NULL;
+					org_data.info.tdata[i].note_p = NULL;
 				#else
-					info.tdata[j].note_p = NULL;	// Uses j instead of i
+					org_data.info.tdata[j].note_p = NULL;	// Uses j instead of i
 				#endif
 				}
 			}
@@ -518,32 +523,32 @@ BOOL OrgData::NoteAlloc(unsigned short alloc)
 
 		for (i = 0; i < alloc; i++)
 		{
-			(info.tdata[j].note_p + i)->from = NULL;
-			(info.tdata[j].note_p + i)->to = NULL;
-			(info.tdata[j].note_p + i)->length = 0;
-			(info.tdata[j].note_p + i)->pan = PANDUMMY;
-			(info.tdata[j].note_p + i)->volume = VOLDUMMY;
-			(info.tdata[j].note_p + i)->y = KEYDUMMY;
+			(org_data.info.tdata[j].note_p + i)->from = NULL;
+			(org_data.info.tdata[j].note_p + i)->to = NULL;
+			(org_data.info.tdata[j].note_p + i)->length = 0;
+			(org_data.info.tdata[j].note_p + i)->pan = PANDUMMY;
+			(org_data.info.tdata[j].note_p + i)->volume = VOLDUMMY;
+			(org_data.info.tdata[j].note_p + i)->y = KEYDUMMY;
 		}
 	}
 
 	for (j = 0; j < MAXMELODY; j++)
-		MakeOrganyaWave(j, info.tdata[j].wave_no, info.tdata[j].pipi);
+		MakeOrganyaWave(j, org_data.info.tdata[j].wave_no, org_data.info.tdata[j].pipi);
 
-	track = 0;	// 今はここに書いておく (Write here now)
+	org_data.track = 0;	// 今はここに書いておく (Write here now)
 
 	return TRUE;
 }
 
 // NoteDataを開放 (Release NoteData)
-void OrgData::ReleaseNote(void)
+void OrgDataReleaseNote(void)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		if (info.tdata[i].note_p != NULL)
+		if (org_data.info.tdata[i].note_p != NULL)
 		{
-			free(info.tdata[i].note_p);
-			info.tdata[i].note_p = NULL;
+			free(org_data.info.tdata[i].note_p);
+			org_data.info.tdata[i].note_p = NULL;
 		}
 	}
 }
@@ -551,7 +556,7 @@ void OrgData::ReleaseNote(void)
 char pass[7] = "Org-01";
 char pass2[7] = "Org-02";	// Pipi
 
-BOOL OrgData::InitMusicData(const char *path)
+BOOL OrgDataInitMusicData(const char *path)
 {
 	#define READ_LE16(p) ((p[1] << 8) | p[0]); p += 2
 	#define READ_LE32(p) ((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0]); p += 4
@@ -578,22 +583,22 @@ BOOL OrgData::InitMusicData(const char *path)
 		return FALSE;
 
 	// 曲の情報を設定 (Set song information)
-	info.wait = READ_LE16(p);
-	info.line = *p++;
-	info.dot = *p++;
-	info.repeat_x = READ_LE32(p);
-	info.end_x = READ_LE32(p);
+	org_data.info.wait = READ_LE16(p);
+	org_data.info.line = *p++;
+	org_data.info.dot = *p++;
+	org_data.info.repeat_x = READ_LE32(p);
+	org_data.info.end_x = READ_LE32(p);
 
 	for (i = 0; i < MAXTRACK; i++)
 	{
-		info.tdata[i].freq = READ_LE16(p);
+		org_data.info.tdata[i].freq = READ_LE16(p);
 
-		info.tdata[i].wave_no = *p++;
+		org_data.info.tdata[i].wave_no = *p++;
 
 		if (ver == 1)
-			info.tdata[i].pipi = 0;
+			org_data.info.tdata[i].pipi = 0;
 		else
-			info.tdata[i].pipi = *p;
+			org_data.info.tdata[i].pipi = *p;
 
 		++p;
 
@@ -606,13 +611,13 @@ BOOL OrgData::InitMusicData(const char *path)
 		// 最初の音符はfromがNULLとなる (The first note has from as NULL)
 		if (note_num[j] == 0)
 		{
-			info.tdata[j].note_list = NULL;
+			org_data.info.tdata[j].note_list = NULL;
 			continue;
 		}
 
 		// リストを作る (Make a list)
-		np = info.tdata[j].note_p;
-		info.tdata[j].note_list = info.tdata[j].note_p;
+		np = org_data.info.tdata[j].note_p;
+		org_data.info.tdata[j].note_list = org_data.info.tdata[j].note_p;
 		np->from = NULL;
 		np->to = (np + 1);
 		np++;
@@ -629,35 +634,35 @@ BOOL OrgData::InitMusicData(const char *path)
 		np->to = NULL;
 
 		// 内容を代入 (Assign content)
-		np = info.tdata[j].note_p;	// Ｘ座標 (X coordinate)
+		np = org_data.info.tdata[j].note_p;	// Ｘ座標 (X coordinate)
 		for (i = 0; i < note_num[j]; i++)
 		{
 			np->x = READ_LE32(p);
 			np++;
 		}
 
-		np = info.tdata[j].note_p;	// Ｙ座標 (Y coordinate)
+		np = org_data.info.tdata[j].note_p;	// Ｙ座標 (Y coordinate)
 		for (i = 0; i < note_num[j]; i++)
 		{
 			np->y = *p++;
 			np++;
 		}
 
-		np = info.tdata[j].note_p;	// 長さ (Length)
+		np = org_data.info.tdata[j].note_p;	// 長さ (Length)
 		for (i = 0; i < note_num[j]; i++)
 		{
 			np->length = *p++;
 			np++;
 		}
 
-		np = info.tdata[j].note_p;	// ボリューム (Volume)
+		np = org_data.info.tdata[j].note_p;	// ボリューム (Volume)
 		for (i = 0; i < note_num[j]; i++)
 		{
 			np->volume = *p++;
 			np++;
 		}
 
-		np = info.tdata[j].note_p;	// パン (Pan)
+		np = org_data.info.tdata[j].note_p;	// パン (Pan)
 		for (i = 0; i < note_num[j]; i++)
 		{
 			np->pan = *p++;
@@ -667,12 +672,12 @@ BOOL OrgData::InitMusicData(const char *path)
 
 	// データを有効に (Enable data)
 	for (j = 0; j < MAXMELODY; j++)
-		MakeOrganyaWave(j,info.tdata[j].wave_no, info.tdata[j].pipi);
+		MakeOrganyaWave(j,org_data.info.tdata[j].wave_no, org_data.info.tdata[j].pipi);
 
 	// Pixel ripped out some code so he could use PixTone sounds as drums, but he left this dead code
 	for (j = MAXMELODY; j < MAXTRACK; j++)
 	{
-		i = info.tdata[j].wave_no;
+		i = org_data.info.tdata[j].wave_no;
 		//InitDramObject(dram_name[i], j - MAXMELODY);
 	}
 
@@ -682,20 +687,20 @@ BOOL OrgData::InitMusicData(const char *path)
 }
 
 // 曲情報を取得 (Get song information)
-void OrgData::GetMusicInfo(MUSICINFO *mi)
+void OrgDataGetMusicInfo(MUSICINFO *mi)
 {
-	mi->dot = info.dot;
-	mi->line = info.line;
-	mi->alloc_note = info.alloc_note;
-	mi->wait = info.wait;
-	mi->repeat_x = info.repeat_x;
-	mi->end_x = info.end_x;
+	mi->dot = org_data.info.dot;
+	mi->line = org_data.info.line;
+	mi->alloc_note = org_data.info.alloc_note;
+	mi->wait = org_data.info.wait;
+	mi->repeat_x = org_data.info.repeat_x;
+	mi->end_x = org_data.info.end_x;
 
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		mi->tdata[i].freq = info.tdata[i].freq;
-		mi->tdata[i].wave_no = info.tdata[i].wave_no;
-		mi->tdata[i].pipi = info.tdata[i].pipi;
+		mi->tdata[i].freq = org_data.info.tdata[i].freq;
+		mi->tdata[i].wave_no = org_data.info.tdata[i].wave_no;
+		mi->tdata[i].pipi = org_data.info.tdata[i].pipi;
 	}
 }
 
@@ -708,7 +713,7 @@ int Volume = 100;
 int TrackVol[MAXTRACK];
 BOOL bFadeout = FALSE;
 
-void OrgData::PlayData(void)
+void OrgDataPlayData(void)
 {
 	int i;
 
@@ -725,7 +730,7 @@ void OrgData::PlayData(void)
 		{
 			if (!g_mute[i] && np[i]->y != KEYDUMMY)	// 音が来た。 (The sound has come.)
 			{
-				PlayOrganObject(np[i]->y, -1, i, info.tdata[i].freq);
+				PlayOrganObject(np[i]->y, -1, i, org_data.info.tdata[i].freq);
 				now_leng[i] = np[i]->length;
 			}
 
@@ -738,7 +743,7 @@ void OrgData::PlayData(void)
 		}
 
 		if (now_leng[i] == 0)
-			PlayOrganObject(0, 2, i, info.tdata[i].freq);
+			PlayOrganObject(0, 2, i, org_data.info.tdata[i].freq);
 
 		if (now_leng[i] > 0)
 			now_leng[i]--;
@@ -769,18 +774,18 @@ void OrgData::PlayData(void)
 
 	// Looping
 	PlayPos++;
-	if (PlayPos >= info.end_x)
+	if (PlayPos >= org_data.info.end_x)
 	{
-		PlayPos = info.repeat_x;
+		PlayPos = org_data.info.repeat_x;
 		SetPlayPointer(PlayPos);
 	}
 }
 
-void OrgData::SetPlayPointer(long x)
+void OrgDataSetPlayPointer(long x)
 {
 	for (int i = 0; i < MAXTRACK; i++)
 	{
-		np[i] = info.tdata[i].note_list;
+		np[i] = org_data.info.tdata[i].note_list;
 		while (np[i] != NULL && np[i]->x < x)
 			np[i] = np[i]->to;	// 見るべき音符を設定 (Set note to watch)
 	}
@@ -797,7 +802,7 @@ BOOL StartOrganya(const char *path_wave)	// The argument is ignored for some rea
 	if (!InitWaveData100())
 		return FALSE;
 
-	org_data.InitOrgData();
+	OrgDataInitOrgData();
 
 	AudioBackend_SetOrganyaCallback(OrganyaCallback);
 
@@ -810,7 +815,7 @@ BOOL LoadOrganya(const char *name)
 	if (!audio_backend_initialised)
 		return FALSE;
 
-	if (!org_data.InitMusicData(name))
+	if (!OrgDataInitMusicData(name))
 		return FALSE;
 
 	Volume = 100;
@@ -828,7 +833,7 @@ void SetOrganyaPosition(unsigned int x)
 	if (!audio_backend_initialised)
 		return;
 
-	org_data.SetPlayPointer(x);
+	OrgDataSetPlayPointer(x);
 	Volume = 100;
 	bFadeout = FALSE;
 }
@@ -897,7 +902,7 @@ void EndOrganya(void)
 	AudioBackend_SetOrganyaTimer(0);
 
 	// Release everything related to org
-	org_data.ReleaseNote();
+	OrgDataReleaseNote();
 
 	for (int i = 0; i < MAXMELODY; i++)
 	{

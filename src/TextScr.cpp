@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -133,17 +132,17 @@ void EncryptionBinaryData2(unsigned char *pData, long size)
 BOOL LoadTextScript2(const char *name)
 {
 	FILE *fp;
-	std::string path;
+	char path[128];
 
 	// Get path
-	path = gDataPath + '/' + name;
+	snprint(path, sizeof path, "%s/%s", gDataPath, name);
 
-	gTS.size = GetFileSizeLong(path.c_str());
+	gTS.size = GetFileSizeLong(path);
 	if (gTS.size == -1)
 		return FALSE;
 
 	// Open file
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -165,14 +164,14 @@ BOOL LoadTextScript2(const char *name)
 BOOL LoadTextScript_Stage(const char *name)
 {
 	FILE *fp;
-	std::string path;
+	char path[128];
 	long head_size;
 	long body_size;
 
 	// Open Head.tsc
-	path = gDataPath + "/Head.tsc";
+	snprint(path, sizeof path, "%s/Head.tsc", gDataPath);
 
-	head_size = GetFileSizeLong(path.c_str());
+	head_size = GetFileSizeLong(path);
 	if (head_size == -1)
 		return FALSE;
 
@@ -183,7 +182,7 @@ BOOL LoadTextScript_Stage(const char *name)
 		return FALSE;
 #endif
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -194,9 +193,9 @@ BOOL LoadTextScript_Stage(const char *name)
 	fclose(fp);
 
 	// Open stage's .tsc
-	path = gDataPath + '/' + name;
+	snprint(path, sizeof path, "%s/%s", name);
 
-	body_size = GetFileSizeLong(path.c_str());
+	body_size = GetFileSizeLong(path);
 	if (body_size == -1)
 		return FALSE;
 
@@ -206,7 +205,7 @@ BOOL LoadTextScript_Stage(const char *name)
 		return FALSE;
 #endif
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -224,7 +223,7 @@ BOOL LoadTextScript_Stage(const char *name)
 }
 
 // Get current path
-std::string GetTextScriptPath(void)
+char *GetTextScriptPath(void)
 {
 	return gTS.path;
 }

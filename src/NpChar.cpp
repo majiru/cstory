@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -68,9 +67,10 @@ BOOL LoadEvent(const char *path_event)
 	char code[4];
 	EVENT eve;
 
-	std::string path = gDataPath + '/' + path_event;
+	char path[128];
+	snprint(path, sizeof path, "%s/%s", gDataPath, path_event);
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 

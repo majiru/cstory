@@ -4,7 +4,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <string>
 
 #include "../Attributes.h"
 
@@ -89,16 +88,16 @@ enum
 	BACKEND_KEYBOARD_TOTAL
 };
 
-bool Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(bool focus));
+int Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(int focus));
 void Backend_Deinit(void);
 void Backend_PostWindowCreation(void);
-bool Backend_GetPaths(std::string *module_path, std::string *data_path);
+int Backend_GetPaths(char **module_path, char **data_path);
 void Backend_HideMouse(void);
 void Backend_SetWindowIcon(const unsigned char *rgb_pixels, size_t width, size_t height);
 void Backend_SetCursor(const unsigned char *rgba_pixels, size_t width, size_t height);
 void Backend_EnableDragAndDrop(void);
-bool Backend_SystemTask(bool active);
-void Backend_GetKeyboardState(bool *keyboard_state);
+int Backend_SystemTask(int active);
+void Backend_GetKeyboardState(int *keyboard_state);
 void Backend_ShowMessageBox(const char *title, const char *message);
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintError(const char *format, ...);
 ATTRIBUTE_FORMAT_PRINTF(1, 2) void Backend_PrintInfo(const char *format, ...);

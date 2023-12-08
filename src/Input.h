@@ -9,6 +9,7 @@
 
 #include "WindowsWrapper.h"
 
+typedef struct DIRECTINPUTSTATUS DIRECTINPUTSTATUS;
 struct DIRECTINPUTSTATUS
 {
 	BOOL bLeft;

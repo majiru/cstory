@@ -7,6 +7,7 @@
 
 #pragma once
 
+typedef int FlashMode;
 enum FlashMode
 {
 	FLASH_MODE_EXPLOSION = 1,

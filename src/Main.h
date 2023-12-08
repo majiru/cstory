@@ -7,12 +7,10 @@
 
 #pragma once
 
-#include <string>
-
 #include "WindowsWrapper.h"
 
-extern std::string gModulePath;
-extern std::string gDataPath;
+extern char *gModulePath;
+extern char *gDataPath;
 
 extern BOOL bFullscreen;
 extern BOOL gbUseJoystick;

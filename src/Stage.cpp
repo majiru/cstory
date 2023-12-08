@@ -5,9 +5,8 @@
 // Modifications and custom code are under the MIT licence.
 // See LICENCE.txt for details.
 
+#include <stdio.h>
 #include "Stage.h"
-
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -137,8 +136,8 @@ const STAGE_TABLE gTMT[] = {
 
 BOOL TransferStage(int no, int w, int x, int y)
 {
-	std::string path;
-	std::string path_dir;
+	char path[128];
+	char path_dir[128];
 	BOOL bError;
 
 	// Move character
@@ -147,47 +146,47 @@ BOOL TransferStage(int no, int w, int x, int y)
 	bError = FALSE;
 
 	// Get path
-	path_dir = "Stage";
+	snprint(path_dir, sizeof path_dir, "Stage");
 
 	// Load tileset
-	path = path_dir + "/Prt" + gTMT[no].parts;
-	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_TILESET))
+	snprint(path, sizeof path, "%s/Prt%s", path_dir, gTMT[no].parts);
+	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	path = path_dir + '/' + gTMT[no].parts + ".pxa";
-	if (!LoadAttributeData(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.pxa", path_dir, gTMT[no].map);
+	if (!LoadAttributeData(path))
 		bError = TRUE;
 
 	// Load tilemap
-	path = path_dir + '/' + gTMT[no].map + ".pxm";
-	if (!LoadMapData2(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.pxm", path_dir, gTMT[no].map);
+	if (!LoadMapData2(path))
 		bError = TRUE;
 
 	// Load NPCs
-	path = path_dir + '/' + gTMT[no].map + ".pxe";
-	if (!LoadEvent(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.pxe", path_dir, gTMT[no].map);
+	if (!LoadEvent(path))
 		bError = TRUE;
 
 	// Load script
-	path = path_dir + '/' + gTMT[no].map + ".tsc";
-	if (!LoadTextScript_Stage(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.tsc", path_dir, gTMT[no].map);
+	if (!LoadTextScript_Stage(path))
 		bError = TRUE;
 
 	// Load background
-	path = gTMT[no].back;
-	if (!InitBack(path.c_str(), gTMT[no].bkType))
+	snprint(path, sizeof path, "%s", gTMT[no].back);
+	if (!InitBack(path, gTMT[no].bkType))
 		bError = TRUE;
 
 	// Get path
-	path_dir = "Npc";
+	snprint(path_dir, sizeof path_dir, "Npc");
 
 	// Load NPC sprite sheets
-	path = path_dir + "/Npc" + gTMT[no].npc;
-	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_1))
+	snprint(path, sizeof path, "%s/Npc%s", path_dir, gTMT[no].npc);
+	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_1))
 		bError = TRUE;
 
-	path = path_dir + "/Npc" + gTMT[no].boss;
-	if (!ReloadBitmap_File(path.c_str(), SURFACE_ID_LEVEL_SPRITESET_2))
+	snprint(path, sizeof path, "%s/Npc%s", path_dir, gTMT[no].boss);
+	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_SPRITESET_2))
 		bError = TRUE;
 
 	if (bError)

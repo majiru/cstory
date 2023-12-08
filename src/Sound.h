@@ -33,6 +33,7 @@ enum SoundEffectNames
 	// To be continued
 };
 
+typedef int SoundMode;
 enum SoundMode
 {
 	SOUND_MODE_PLAY_LOOP = -1,

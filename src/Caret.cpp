@@ -18,6 +18,7 @@
 
 #define CARET_MAX 0x40
 
+typedef struct CARET CARET;
 struct CARET
 {
 	int cond;
@@ -36,6 +37,7 @@ struct CARET
 	RECT rect;
 };
 
+typedef struct CARET_TABLE CARET_TABLE;
 struct CARET_TABLE
 {
 	int view_left;

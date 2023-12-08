@@ -9,11 +9,12 @@
 
 #define RGB(r,g,b) ((r) | ((g) << 8) | ((b) << 16))
 
-typedef bool BOOL;
+typedef int BOOL;
 
-#define FALSE false
-#define TRUE true
+#define FALSE 0
+#define TRUE 1
 
+typedef struct RECT RECT;
 struct RECT
 {
 	long left;

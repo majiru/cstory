@@ -13,6 +13,7 @@
 #define FADE_WIDTH	(((WINDOW_WIDTH - 1) / 16) + 1)
 #define FADE_HEIGHT	(((WINDOW_HEIGHT - 1) / 16) + 1)
 
+typedef struct FADE FADE;
 struct FADE
 {
 	int mode;

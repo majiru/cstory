@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
 
 #ifdef __3DS__
  #include <3ds.h>
@@ -237,7 +236,7 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 	if (image_buffer == NULL)
 		return FALSE;
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, false);
+	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, FALSE);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -266,11 +265,13 @@ BOOL MakeSurface_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 {
-	std::string path = gDataPath + '/' + name + ".pbm";
+	char path[128];
 
-	if (!IsEnableBitmap(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.pbm", gDataPath, name);
+
+	if (!IsEnableBitmap(path))
 	{
-		ErrorLog(path.c_str(), 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -291,15 +292,15 @@ BOOL MakeSurface_File(const char *name, SurfaceID surf_no)
 	}
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height, 3);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height, 3);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path.c_str(), 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 
-	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, false);
+	surf[surf_no] = RenderBackend_CreateSurface(width * mag, height * mag, FALSE);
 
 	if (surf[surf_no] == NULL)
 	{
@@ -357,11 +358,13 @@ BOOL ReloadBitmap_Resource(const char *name, SurfaceID surf_no)
 // TODO - Inaccurate stack frame
 BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 {
-	std::string path = gDataPath + '/' + name + ".pbm";
+	char path[128];
 
-	if (!IsEnableBitmap(path.c_str()))
+	snprint(path, sizeof path, "%s/%s.pbm", gDataPath, name);
+
+	if (!IsEnableBitmap(path))
 	{
-		ErrorLog(path.c_str(), 0);
+		ErrorLog(path, 0);
 		return FALSE;
 	}
 
@@ -376,11 +379,11 @@ BOOL ReloadBitmap_File(const char *name, SurfaceID surf_no)
 	}
 
 	size_t width, height;
-	unsigned char *image_buffer = DecodeBitmapFromFile(path.c_str(), &width, &height, 3);
+	unsigned char *image_buffer = DecodeBitmapFromFile(path, &width, &height, 3);
 
 	if (image_buffer == NULL)
 	{
-		ErrorLog(path.c_str(), 1);
+		ErrorLog(path, 1);
 		return FALSE;
 	}
 
@@ -605,7 +608,7 @@ void CortBox2(const RECT *rect, unsigned long col, SurfaceID surf_no)
 BOOL out(char surface_identifier)
 {
 	// The actual name (and type) of these two variables are unknown
-	std::string path;
+	char path[128];
 	FILE *fp;
 
 	(void)surface_identifier;
@@ -678,9 +681,10 @@ int RestoreSurfaces(void)
 void InitTextObject(const char *name)
 {
 	(void)name;	// Unused in this branch
+	char path[128];
 
 #ifdef FREETYPE_FONTS
-	std::string path = gDataPath + "/Font/font";
+	snprint(path, sizeof path, "%s/Font/font", gDataPath);
 
 	// Get font size
 	size_t width, height;
@@ -723,25 +727,25 @@ void InitTextObject(const char *name)
 			break;
 	}
 
-	font = LoadFreeTypeFont(path.c_str(), width, height);
+	font = LoadFreeTypeFont(path, width, height);
 #else
-	std::string bitmap_path;
-	std::string metadata_path;
+	char bitmap_path[128];
+	char metadata_path[128];
 
 	switch (mag)
 	{
 		case 1:
-			bitmap_path = gDataPath + "/Font/font_bitmap_6x12.png";
-			metadata_path = gDataPath + "/Font/font_bitmap_6x12.dat";
+			snprint(bitmap_path, sizeof bitmap_path, "%s/Font/font_bitmap_6x12.png", gDataPath);
+			snprint(metadata_path, sizeof metadata_path, "%s/Font/font_bitmap_6x12.dat", gDataPath);
 			break;
 
 		case 2:
-			bitmap_path = gDataPath + "/Font/font_bitmap_10x20.png";
-			metadata_path = gDataPath + "/Font/font_bitmap_10x20.dat";
+			snprint(bitmap_path, sizeof bitmap_path, "%s/Font/font_bitmap_10x20.png", gDataPath);
+			snprint(metadata_path, sizeof metadata_path, "%s/Font/font_bitmap_10x20.dat", gDataPath);
 			break;
 	}
 
-	font = LoadBitmapFont(bitmap_path.c_str(), metadata_path.c_str());
+	font = LoadBitmapFont(bitmap_path, metadata_path);
 #endif
 }
 

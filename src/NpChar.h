@@ -97,6 +97,7 @@ typedef struct NPCHAR
 	struct NPCHAR *pNpc;
 } NPCHAR;
 
+typedef struct EVENT EVENT;
 struct EVENT
 {
 	short x;

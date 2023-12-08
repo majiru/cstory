@@ -8,7 +8,6 @@
 #include "Game.h"
 
 #include <stddef.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -706,9 +705,10 @@ BOOL Game(void)
 
 	PlaySoundObject(7, SOUND_MODE_PLAY_LOOP);
 
-	std::string path = gDataPath + "/npc.tbl";
+	char path[128];
+	snprint(path, sizeof path, "%s/npc.tbl", gDataPath);
 
-	if (!LoadNpcTable(path.c_str()))
+	if (!LoadNpcTable(path))
 	{
 	#if !defined(JAPANESE) && defined(FIX_BUGS) // The Aeon Genesis translation didn't translate this
 		Backend_ShowMessageBox("Error", "Couldn't read the NPC table");

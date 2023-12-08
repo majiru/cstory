@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -36,9 +35,10 @@ const char* const gProfileCode = "Do041220";
 
 BOOL IsProfile(void)
 {
-	std::string path = gModulePath + '/' + gDefaultName;
+	char path[128];
+	snprint(path, sizeof path, "%s/%s", gModulePath, gDefaultName);
 
-	FILE *file = fopen(path.c_str(), "rb");
+	FILE *file = fopen(path, "rb");
 	if (file == NULL)
 		return FALSE;
 
@@ -52,16 +52,16 @@ BOOL SaveProfile(const char *name)
 	PROFILEDATA profile;
 	const char *FLAG = "FLAG";
 
-	std::string path;
+	char path[128];
 
 	// Get path
 	if (name != NULL)
-		path = gModulePath + '/' + name;
+		snprint(path, sizeof path, "%s/%s", gModulePath, name);
 	else
-		path = gModulePath + '/' + gDefaultName;
+		snprint(path, sizeof path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
-	fp = fopen(path.c_str(), "wb");
+	fp = fopen(path, "wb");
 	if (fp == NULL)
 		return FALSE;
 
@@ -131,16 +131,16 @@ BOOL LoadProfile(const char *name)
 {
 	FILE *fp;
 	PROFILEDATA profile;
-	std::string path;
+	char path[128];
 
 	// Get path
 	if (name != NULL)
-		path = name;
+		snprint(path, sizeof path, "%s", name);
 	else
-		path = gModulePath + '/' + gDefaultName;
+		snprint(path, sizeof path, "%s/%s", gModulePath, gDefaultName);
 
 	// Open file
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 

@@ -8,7 +8,6 @@
 #include "SelStage.h"
 
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -167,7 +166,7 @@ void PutStageSelectObject(void)
 
 int StageSelectLoop(int *p_event)
 {
-	std::string old_script_path;
+	char *old_script_path;
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -223,7 +222,7 @@ int StageSelectLoop(int *p_event)
 		if (gKeyTrg & gKeyCancel)
 		{
 			StopTextScript();
-			LoadTextScript_Stage(old_script_path.c_str());
+			LoadTextScript_Stage(old_script_path);
 			*p_event = 0;
 			return enum_ESCRETURN_continue;
 		}
@@ -234,7 +233,7 @@ int StageSelectLoop(int *p_event)
 			return enum_ESCRETURN_exit;
 	}
 
-	LoadTextScript_Stage(old_script_path.c_str());
+	LoadTextScript_Stage(old_script_path);
 	*p_event = gPermitStage[gSelectedStage].event;
 	return enum_ESCRETURN_continue;
 }

@@ -29,6 +29,7 @@ enum Direction
 	DIR_OTHER = 5
 };
 
+typedef struct OTHER_RECT OTHER_RECT;
 struct OTHER_RECT	// The original name for this struct is unknown
 {
 	int front;

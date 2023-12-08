@@ -827,6 +827,7 @@ void ActNpc065(NPCHAR *npc)
 // Misery bubble
 void ActNpc066(NPCHAR *npc)
 {
+	int a;
 	RECT rect[4] = {
 		{32, 192, 56, 216},
 		{56, 192, 80, 216},
@@ -837,7 +838,6 @@ void ActNpc066(NPCHAR *npc)
 	switch (npc->act_no)
 	{
 		case 0:
-			int a;
 			for (a = 0; a < NPC_MAX; ++a)
 				if (gNPC[a].code_event == 1000)
 					break;

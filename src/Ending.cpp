@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -26,6 +25,7 @@
 #include "Stage.h"
 #include "TextScr.h"
 
+typedef int CREDIT_MODE;
 enum CREDIT_MODE
 {
 	CREDIT_MODE_STOP,
@@ -33,6 +33,7 @@ enum CREDIT_MODE
 	CREDIT_MODE_SCROLL_WAIT
 };
 
+typedef int ILLUSTRATION_ACTION;
 enum ILLUSTRATION_ACTION
 {
 	ILLUSTRATION_ACTION_IDLE,
@@ -40,6 +41,7 @@ enum ILLUSTRATION_ACTION
 	ILLUSTRATION_ACTION_SLIDE_OUT
 };
 
+typedef struct CREDIT CREDIT;
 struct CREDIT
 {
 	long size;
@@ -50,6 +52,7 @@ struct CREDIT
 	int start_x;
 };
 
+typedef struct STRIP STRIP;
 struct STRIP
 {
 	int flag;
@@ -59,12 +62,14 @@ struct STRIP
 	char str[0x40];
 };
 
+typedef struct ILLUSTRATION ILLUSTRATION;
 struct ILLUSTRATION
 {
 	ILLUSTRATION_ACTION act_no;
 	int x;
 };
 
+typedef struct ISLAND_SPRITE ISLAND_SPRITE;
 struct ISLAND_SPRITE
 {
 	int x;
@@ -239,7 +244,7 @@ void ReleaseCreditScript(void)
 BOOL StartCreditScript(void)
 {
 	FILE *fp;
-	std::string path;
+	char path[128];
 
 	// Clear previously existing credits data
 	if (Credit.pData != NULL)
@@ -249,9 +254,9 @@ BOOL StartCreditScript(void)
 	}
 
 	// Open file
-	path = gDataPath + '/' + credit_script;
+	snprint(path, sizeof path, "%s/%s", gDataPath, credit_script);
 
-	Credit.size = GetFileSizeLong(path.c_str());
+	Credit.size = GetFileSizeLong(path);
 	if (Credit.size == -1)
 		return FALSE;
 
@@ -260,7 +265,7 @@ BOOL StartCreditScript(void)
 	if (Credit.pData == NULL)
 		return FALSE;
 
-	fp = fopen(path.c_str(), "rb");
+	fp = fopen(path, "rb");
 	if (fp == NULL)
 	{
 		free(Credit.pData);

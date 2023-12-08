@@ -9,6 +9,7 @@
 
 #include "WindowsWrapper.h"
 
+typedef struct CONFIGDATA CONFIGDATA;
 struct CONFIGDATA
 {
 	char proof[0x20];

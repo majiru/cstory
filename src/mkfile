@@ -1,0 +1,85 @@
+</$objtype/mkfile
+
+CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__ -I../assets
+BIN=/$objtype/bin/games
+TARG=cstory
+
+OFILES=\
+	ArmsItem.$O\
+	Back.$O\
+	Bitmap.$O\
+	Boss.$O\
+	BossAlmo1.$O\
+	BossAlmo2.$O\
+	BossBallos.$O\
+	BossFrog.$O\
+	BossIronH.$O\
+	BossLife.$O\
+	BossOhm.$O\
+	BossPress.$O\
+	BossTwinD.$O\
+	BossX.$O\
+	BulHit.$O\
+	Bullet.$O\
+	Caret.$O\
+	Config.$O\
+	Draw.$O\
+	Ending.$O\
+	Escape.$O\
+	Fade.$O\
+	File.$O\
+	Flags.$O\
+	Flash.$O\
+	Font.$O\
+	Frame.$O\
+	Game.$O\
+	Generic.$O\
+	GenericLoad.$O\
+	Input.$O\
+	KeyControl.$O\
+	Main.$O\
+	Map.$O\
+	MapName.$O\
+	MiniMap.$O\
+	MyChar.$O\
+	MycHit.$O\
+	MycParam.$O\
+	NpcAct000.$O\
+	NpcAct020.$O\
+	NpcAct040.$O\
+	NpcAct060.$O\
+	NpcAct080.$O\
+	NpcAct100.$O\
+	NpcAct120.$O\
+	NpcAct140.$O\
+	NpcAct160.$O\
+	NpcAct180.$O\
+	NpcAct200.$O\
+	NpcAct220.$O\
+	NpcAct240.$O\
+	NpcAct260.$O\
+	NpcAct280.$O\
+	NpcAct300.$O\
+	NpcAct320.$O\
+	NpcAct340.$O\
+	NpChar.$O\
+	NpcHit.$O\
+	NpcTbl.$O\
+	Organya.$O\
+	PixTone.$O\
+	Profile.$O\
+	Random.$O\
+#	Resource.$O\
+	SelStage.$O\
+	Shoot.$O\
+	Sound.$O\
+	Stage.$O\
+	Star.$O\
+	TextScr.$O\
+	Triangle.$O\
+	ValueView.$O\
+
+</sys/src/cmd/mkone
+
+%.$O:	%.cpp
+	$CC $CFLAGS -o $stem.$O $stem.cpp

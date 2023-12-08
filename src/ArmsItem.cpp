@@ -8,7 +8,6 @@
 #include "ArmsItem.h"
 
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -422,7 +421,7 @@ void PutCampObject(void)
 
 int CampLoop(void)
 {
-	std::string old_script_path;
+	char *old_script_path;
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
@@ -506,7 +505,7 @@ int CampLoop(void)
 	}
 
 	// Resume original script
-	LoadTextScript_Stage(old_script_path.c_str());
+	LoadTextScript_Stage(old_script_path);
 	gArmsEnergyX = 32; // Displays weapon rotation animation in case the weapon was changed
 	return enum_ESCRETURN_continue;	// Go to game
 }

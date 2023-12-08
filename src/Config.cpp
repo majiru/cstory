@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
 
 #include "WindowsWrapper.h"
 
@@ -21,14 +20,15 @@ const char* const gProof = "DOUKUTSU20041206";
 
 BOOL LoadConfigData(CONFIGDATA *conf)
 {
+	char path[128];
 	// Clear old configuration data
 	memset(conf, 0, sizeof(CONFIGDATA));
 
 	// Get path
-	std::string path = gModulePath + '/' + gConfigName;
+	snprint(path, sizeof path, "%s/%s", gModulePath, gConfigName);
 
 	// Open file
-	FILE *fp = fopen(path.c_str(), "rb");
+	FILE *fp = fopen(path, "rb");
 	if (fp == NULL)
 		return FALSE;
 
