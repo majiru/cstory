@@ -193,7 +193,7 @@ BOOL LoadTextScript_Stage(const char *name)
 	fclose(fp);
 
 	// Open stage's .tsc
-	snprint(path, sizeof path, "%s/%s", name);
+	snprint(path, sizeof path, "%s/%s", gDataPath, name);
 
 	body_size = GetFileSizeLong(path);
 	if (body_size == -1)

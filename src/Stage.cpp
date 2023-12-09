@@ -153,7 +153,7 @@ BOOL TransferStage(int no, int w, int x, int y)
 	if (!ReloadBitmap_File(path, SURFACE_ID_LEVEL_TILESET))
 		bError = TRUE;
 
-	snprint(path, sizeof path, "%s/%s.pxa", path_dir, gTMT[no].map);
+	snprint(path, sizeof path, "%s/%s.pxa", path_dir, gTMT[no].parts);
 	if (!LoadAttributeData(path))
 		bError = TRUE;
 
