@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__
+CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__ -DFIX_BUGS
 BIN=/$objtype/bin/games
 TARG=cstory
 
@@ -173,3 +173,7 @@ src/Resource/%.h:	$O.bin2h assets/resources/$stem
 	$O.bin2h assets/resources/$stem $target
 
 src/Resource.$O:	$ASSETS
+
+install:V:	$BIN/$TARG
+	mkdir -p /sys/games/lib/cstory
+	dircp game_english /sys/games/lib/cstory/
