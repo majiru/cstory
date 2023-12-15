@@ -58,7 +58,7 @@ static void MixSoundsAndUpdateOrganya(long *stream, size_t frames_total)
 	SoftwareMixerBackend_UnlockOrganyaMutex();
 }
 
-bool AudioBackend_Init(void)
+int AudioBackend_Init(void)
 {
 	output_frequency = SoftwareMixerBackend_Init(MixSoundsAndUpdateOrganya);
 
@@ -67,17 +67,17 @@ bool AudioBackend_Init(void)
 		Mixer_Init(output_frequency);
 
 		if (SoftwareMixerBackend_Start())
-			return true;
+			return 1;
 
 		SoftwareMixerBackend_Deinit();
 	}
 
-	return false;
+	return 0;
 }
 
 void AudioBackend_Deinit(void)
 {
-	return SoftwareMixerBackend_Deinit();
+	SoftwareMixerBackend_Deinit();
 }
 
 AudioBackend_Sound* AudioBackend_CreateSound(unsigned int frequency, const unsigned char *samples, size_t length)
@@ -103,7 +103,7 @@ void AudioBackend_DestroySound(AudioBackend_Sound *sound)
 	SoftwareMixerBackend_UnlockMixerMutex();
 }
 
-void AudioBackend_PlaySound(AudioBackend_Sound *sound, bool looping)
+void AudioBackend_PlaySound(AudioBackend_Sound *sound, int looping)
 {
 	if (sound == NULL)
 		return;

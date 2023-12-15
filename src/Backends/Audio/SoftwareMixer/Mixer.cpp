@@ -15,6 +15,7 @@
 
 #define LANCZOS_KERNEL_RADIUS 2
 
+typedef struct Mixer_Sound Mixer_Sound;
 struct Mixer_Sound
 {
 	signed char *samples;
@@ -22,8 +23,8 @@ struct Mixer_Sound
 	size_t position;
 	unsigned short position_subsample;
 	unsigned long advance_delta; // 16.16 fixed-point
-	bool playing;
-	bool looping;
+	int playing;
+	int looping;
 	short volume;    // 8.8 fixed-point
 	short pan_l;     // 8.8 fixed-point
 	short pan_r;     // 8.8 fixed-point
@@ -77,7 +78,7 @@ Mixer_Sound* Mixer_CreateSound(unsigned int frequency, const unsigned char *samp
 		sound->samples[i] = samples[i] - 0x80;	// Convert from unsigned 8-bit PCM to signed
 
 	sound->frames = length;
-	sound->playing = false;
+	sound->playing = 0;
 	sound->position = 0;
 	sound->position_subsample = 0;
 
@@ -108,9 +109,9 @@ void Mixer_DestroySound(Mixer_Sound *sound)
 	}
 }
 
-void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
+void Mixer_PlaySound(Mixer_Sound *sound, int looping)
 {
-	sound->playing = true;
+	sound->playing = 1;
 	sound->looping = looping;
 
 	// Fill the out-of-bounds part of the buffer with
@@ -139,7 +140,7 @@ void Mixer_PlaySound(Mixer_Sound *sound, bool looping)
 
 void Mixer_StopSound(Mixer_Sound *sound)
 {
-	sound->playing = false;
+	sound->playing = 0;
 }
 
 void Mixer_RewindSound(Mixer_Sound *sound)
@@ -233,7 +234,7 @@ ATTRIBUTE_HOT void Mixer_MixSounds(long *stream, size_t frames_total)
 					}
 					else
 					{
-						sound->playing = false;
+						sound->playing = 0;
 						sound->position = 0;
 						sound->position_subsample = 0;
 						break;

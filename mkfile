@@ -79,9 +79,11 @@ OFILES=\
 	src/Triangle.$O\
 	src/ValueView.$O\
 	src/Backends/Platform/9front.$O\
-	src/Backends/Audio/9front.$O\
 	src/Backends/Controller/9front.$O\
 	src/Backends/Rendering/9front.$O\
+	src/Backends/Audio/SoftwareMixer.$O\
+	src/Backends/Audio/SoftwareMixer/Mixer.$O\
+	src/Backends/Audio/SoftwareMixer/9front.$O\
 
 ASSETS=\
 	src/Resource/BITMAP/Credit01.bmp.h\
