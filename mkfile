@@ -81,8 +81,7 @@ OFILES=\
 	src/Backends/Platform/9front.$O\
 	src/Backends/Audio/9front.$O\
 	src/Backends/Controller/9front.$O\
-	src/Backends/Rendering/Software.$O\
-	src/Backends/Rendering/Window/Software/9front.$O\
+	src/Backends/Rendering/9front.$O\
 
 ASSETS=\
 	src/Resource/BITMAP/Credit01.bmp.h\

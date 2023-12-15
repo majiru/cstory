@@ -13,7 +13,6 @@
 
 static int keyboard_state[BACKEND_KEYBOARD_TOTAL];
 static Mousectl *mctl;
-Channel *drawreq; /* Chan(Memimage*) */
 
 int Mark_Rune(int *kbd, Rune r)
 {
@@ -130,7 +129,7 @@ void Key_Proc(void*)
 
 void Backend_Proc(void*)
 {
-	enum { Aresize, Amouse, Adraw, Aend };
+	enum { Aresize, Amouse, Aend };
 	Mouse m;
 	Memimage *b;
 	Memimage *memscreen = nil;
@@ -138,27 +137,15 @@ void Backend_Proc(void*)
 	Alt a[] = {
 		[Amouse] { nil, &m, CHANRCV },
 		[Aresize] { nil, nil, CHANRCV },
-		[Adraw] { drawreq, &b, CHANRCV },
 		[Aend] { nil, nil, CHANEND },
 	};
 	a[Amouse].c = mctl->c;
 	a[Aresize].c = mctl->resizec;
 
-	goto Resize;
 	for(;;){
 		switch(alt(a)){
 		case Aresize:
 			getwindow(display, Refnone);
-		Resize:
-			free(memscreen);
-			memscreen = allocmemimage(screen->r, screen->chan);
-			if(memscreen == nil)
-				sysfatal("allocmemimage: %r");
-			break;
-		case Adraw:
-			memimagedraw(memscreen, memscreen->r, b, ZP, nil, ZP, S);
-			loadimage(screen, screen->r, memscreen->data->bdata, Dx(screen->r)*Dy(screen->r)*(screen->depth/8));
-			flushimage(display, 1);
 			break;
 		}
 	}
@@ -173,7 +160,6 @@ int Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window
 	memimageinit();
 	if(initdraw(nil, nil, "cstory") < 0)
 		sysfatal("initdraw: %r");
-	drawreq = chancreate(sizeof(Channel*), 1);
 	mctl = initmouse(nil, screen);
 	if(mctl == nil)
 		sysfatal("initmouse: %r");
