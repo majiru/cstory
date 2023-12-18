@@ -50,6 +50,7 @@ static void SoftwareMixerBackend_Proc(void*)
 {
 	int fd;
 
+	threadsetname("audioproc");
 	fd = open("/dev/audio", OWRITE);
 	if(fd < 0)
 		return;
@@ -62,7 +63,7 @@ static void SoftwareMixerBackend_Proc(void*)
 unsigned long SoftwareMixerBackend_Init(void (*callback)(long *stream, size_t frames_total))
 {
 	parent_callback = callback;
-	proccreate(SoftwareMixerBackend_Proc, nil, 8192);
+	proccreate(SoftwareMixerBackend_Proc, nil, 8192*1024);
 	return 44100;
 }
 
