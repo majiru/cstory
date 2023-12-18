@@ -103,6 +103,7 @@ void Key_Proc(void*)
 	int kbfd, n;
 	Rune r;
 
+	threadsetname("keyproc");
 	kbfd = open("/dev/kbd", OREAD);
 	if(kbfd < 0)
 		sysfatal("open: %r");
@@ -131,14 +132,13 @@ void Backend_Proc(void*)
 {
 	enum { Aresize, Amouse, Aend };
 	Mouse m;
-	Memimage *b;
-	Memimage *memscreen = nil;
 
 	Alt a[] = {
 		[Amouse] { nil, &m, CHANRCV },
 		[Aresize] { nil, nil, CHANRCV },
 		[Aend] { nil, nil, CHANEND },
 	};
+	threadsetname("resizeproc");
 	a[Amouse].c = mctl->c;
 	a[Aresize].c = mctl->resizec;
 
@@ -155,7 +155,6 @@ int Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window
 {
 	(void)drag_and_drop_callback;
 	(void)window_focus_callback;
-	int pid;
 
 	memimageinit();
 	if(initdraw(nil, nil, "cstory") < 0)
