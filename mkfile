@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__ -DFIX_BUGS
+CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__ -DFIX_BUGS -DFIX_MAJOR_BUGS
 BIN=/$objtype/bin/games
 TARG=cstory
 
