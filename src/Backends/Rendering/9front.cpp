@@ -262,9 +262,9 @@ void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t
 
 	dw = Dx(atlas->m->r);
 	max = height * pitch;
-	for (iy = 0; iy < max; iy += pitch, y += dw){
+	for (iy = 0; iy < max; iy += pitch, y++){
 		s = pixels + iy;
-		d = atlas->m->data->bdata + (y + x) * 4;
+		d = atlas->m->data->bdata + (y * dw + x) * 4;
 
 		for (ix = 0; ix < width; ix++){
 			*d++ = *s;
@@ -285,7 +285,7 @@ void RenderBackend_PrepareToDrawGlyphs(RenderBackend_GlyphAtlas *atlas, RenderBa
 	glyph_destination_surface = destination_surface;
 
 	freeimage(atlas->color);
-	atlas->color = allocimage(display, Rect(0, 0, 1, 1), screen->chan, 1, (red<<24)|(green<<16)|(blue<<8));
+	atlas->color = allocimage(display, Rect(0, 0, 1, 1), screen->chan, 1, (red<<24)|(green<<16)|(blue<<8)|0xFF);
 }
 
 void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, size_t glyph_width, size_t glyph_height)
@@ -303,6 +303,7 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 		glyph_atlas->dirty = 0;
 	}
 	draw(glyph_destination_surface->i, r, glyph_atlas->color, glyph_atlas->cache, p);
+	glyph_destination_surface->dirty = 1;
 }
 
 void RenderBackend_HandleRenderTargetLoss(void)
