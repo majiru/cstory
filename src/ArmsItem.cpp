@@ -421,12 +421,12 @@ void PutCampObject(void)
 
 int CampLoop(void)
 {
-	char *old_script_path;
+	char old_script_path[128];
 
 	RECT rcView = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
 	// Save the current script path (to restore it when we get out of the inventory)
-	old_script_path = GetTextScriptPath();
+	GetTextScriptPath(old_script_path, sizeof old_script_path);
 
 	// Load the inventory script
 	LoadTextScript2("ArmsItem.tsc");

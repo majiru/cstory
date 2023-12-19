@@ -152,7 +152,7 @@ BOOL LoadTextScript2(const char *name)
 	fclose(fp);
 
 	// Set path
-	gTS.path = name;
+	snprint(gTS.path, sizeof gTS.path, "%s", name);
 
 	// Decrypt data
 	EncryptionBinaryData2((unsigned char*)gTS.data, gTS.size);
@@ -217,15 +217,15 @@ BOOL LoadTextScript_Stage(const char *name)
 
 	// Set parameters
 	gTS.size = head_size + body_size;
-	gTS.path = name;
+	snprint(gTS.path, sizeof gTS.path, "%s", name);
 
 	return TRUE;
 }
 
 // Get current path
-char *GetTextScriptPath(void)
+void GetTextScriptPath(char *s, int n)
 {
-	return gTS.path;
+	snprint(s, n, "%s", gTS.path);
 }
 
 // Get 4 digit number from TSC data
