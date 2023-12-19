@@ -233,8 +233,8 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 		return;
 
 	r = Rect(rect_clamped.left, rect_clamped.top, rect_clamped.right, rect_clamped.bottom);
-	color = allocimage(display, Rect(0, 0, 1, 1), BGR24, 1, (red<<16)|(green<<8)|(blue<<0) );
-	draw(surface->i, surface->i->r, color, nil, ZP);
+	color = allocimage(display, Rect(0, 0, 1, 1), BGR24, 1, (red<<24)|(green<<16)|(blue<<8)|0xFF);
+	draw(surface->i, r, color, nil, ZP);
 	freeimage(color);
 	surface->dirty = 1;
 }
