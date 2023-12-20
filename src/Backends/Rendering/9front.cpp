@@ -36,9 +36,13 @@ static RenderBackend_Surface framebuffer;
 static RenderBackend_GlyphAtlas *glyph_atlas;
 static RenderBackend_Surface *glyph_destination_surface;
 
+enum {
+	scale = 2,
+};
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width, size_t height, int fullscreen)
 {
-	framebuffer.i = allocimage(display, Rect(0, 0, width, height), screen->chan, 0, DBlue);
+	framebuffer.i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DBlue);
 	if(framebuffer.i == nil)
 		sysfatal("could not alloc screen");
 
@@ -65,7 +69,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 	if (surface == NULL)
 		return NULL;
 
-	surface->i = allocimage(display, Rect(0, 0, width, height), screen->chan, 0, DGreen);
+	surface->i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DGreen);
 
 	return surface;
 }
@@ -89,10 +93,47 @@ void RenderBackend_RestoreSurface(RenderBackend_Surface *surface)
 	(void)surface;
 }
 
+void RenderBackend_UploadSurfaceScale(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
+{
+	Image *row;
+	Rectangle r, r2;
+	int i, j, k, l;
+	uchar *buf, *d;
+
+	r = Rect(0, 0, width*scale, 1);
+	r2 = Rect(0, 0, width*scale, scale);
+	row = allocimage(display, r, BGR24, 1, DYellow);
+	buf = malloc(width*scale*3);
+
+	for(i = 0; i < height; i++){
+		d = buf;
+		for(j = 0; j < width; j++)
+		for(k = 0; k < scale; k++){
+			*d++ = pixels[(i*width*3) + j*3 + 0];
+			*d++ = pixels[(i*width*3) + j*3 + 1];
+			*d++ = pixels[(i*width*3) + j*3 + 2];
+		}
+
+		loadimage(row, r, buf, width*scale*3);
+		draw(surface->i, r2, row, nil, ZP);
+		r2.min.y += scale;
+		r2.max.y += scale;
+	}
+
+	freeimage(row);
+	free(buf);
+	surface->dirty = 1;
+}
+
 void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned char *pixels, size_t width, size_t height)
 {
 	Image *i;
 	Rectangle r;
+
+	if(scale != 1){
+		RenderBackend_UploadSurfaceScale(surface, pixels, width, height);
+		return;
+	}
 
 	r = Rect(0, 0, width, height);
 	i = allocimage(display, r, BGR24, 0, DYellow);
@@ -148,46 +189,9 @@ void RenderBackend_CalcMask(RenderBackend_Surface *s)
 void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBackend_Rect *rect, RenderBackend_Surface *destination_surface, long x, long y, int colour_key)
 {
 	Rectangle r, r2;
-	RenderBackend_Rect rect_clamped;
 
-	rect_clamped.left = rect->left;
-	rect_clamped.top = rect->top;
-	rect_clamped.right = rect->right;
-	rect_clamped.bottom = rect->bottom;
-
-	// Clamp the rect and coordinates so we don't write outside the pixel buffer
-	long overflow;
-
-	overflow = 0 - x;
-	if (overflow > 0)
-	{
-		rect_clamped.left += overflow;
-		x += overflow;
-	}
-
-	overflow = 0 - y;
-	if (overflow > 0)
-	{
-		rect_clamped.top += overflow;
-		y += overflow;
-	}
-
-	overflow = (x + (rect_clamped.right - rect_clamped.left)) - destination_surface->i->r.max.x;
-	if (overflow > 0)
-		rect_clamped.right -= overflow;
-
-	overflow = (y + (rect_clamped.bottom - rect_clamped.top)) - destination_surface->i->r.max.y;
-	if (overflow > 0)
-		rect_clamped.bottom -= overflow;
-
-	if (rect_clamped.bottom - rect_clamped.top <= 0)
-		return;
-
-	if (rect_clamped.right - rect_clamped.left <= 0)
-		return;
-
-	r = Rect(rect_clamped.left, rect_clamped.top, rect_clamped.right, rect_clamped.bottom);
-	r2 = Rect(x, y, x+Dx(r), y+Dy(r));
+	r = Rect(rect->left*scale, rect->top*scale, rect->right*scale, rect->bottom*scale);
+	r2 = Rect(x*scale, y*scale, (x*scale+Dx(r)), (y*scale+Dy(r)));
 
 	if(colour_key && source_surface->dirty)
 		RenderBackend_CalcMask(source_surface);
@@ -200,39 +204,8 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 {
 	Rectangle r;
 	Image *color;
-	RenderBackend_Rect rect_clamped;
 
-	rect_clamped.left = rect->left;
-	rect_clamped.top = rect->top;
-	rect_clamped.right = rect->right;
-	rect_clamped.bottom = rect->bottom;
-
-	// Clamp the rect so it doesn't write outside the pixel buffer
-	long overflow;
-
-	overflow = 0 - rect_clamped.left;
-	if (overflow > 0)
-		rect_clamped.left += overflow;
-
-	overflow = 0 - rect_clamped.top;
-	if (overflow > 0)
-		rect_clamped.top += overflow;
-
-	overflow = rect_clamped.right - surface->i->r.max.x;
-	if (overflow > 0)
-		rect_clamped.right -= overflow;
-
-	overflow = rect_clamped.bottom - surface->i->r.max.y;
-	if (overflow > 0)
-		rect_clamped.bottom -= overflow;
-
-	if (rect_clamped.bottom - rect_clamped.top <= 0)
-		return;
-
-	if (rect_clamped.right - rect_clamped.left <= 0)
-		return;
-
-	r = Rect(rect_clamped.left, rect_clamped.top, rect_clamped.right, rect_clamped.bottom);
+	r = Rect(rect->left*scale, rect->top*scale, rect->right*scale, rect->bottom*scale);
 	color = allocimage(display, Rect(0, 0, 1, 1), BGR24, 1, (red<<24)|(green<<16)|(blue<<8)|0xFF);
 	draw(surface->i, r, color, nil, ZP);
 	freeimage(color);
@@ -242,7 +215,7 @@ void RenderBackend_ColourFill(RenderBackend_Surface *surface, const RenderBacken
 RenderBackend_GlyphAtlas* RenderBackend_CreateGlyphAtlas(size_t width, size_t height)
 {
 	RenderBackend_GlyphAtlas *atlas = mallocz(sizeof(RenderBackend_GlyphAtlas), 1);
-	atlas->m = allocmemimage(Rect(0, 0, width, height), screen->chan);
+	atlas->m = allocmemimage(Rect(0, 0, width*scale, height*scale), screen->chan);
 	atlas->dirty = 1;
 	return atlas;
 }
@@ -256,23 +229,25 @@ void RenderBackend_DestroyGlyphAtlas(RenderBackend_GlyphAtlas *atlas)
 
 void RenderBackend_UploadGlyph(RenderBackend_GlyphAtlas *atlas, size_t x, size_t y, const unsigned char *pixels, size_t width, size_t height, size_t pitch)
 {
-	uchar *s, *d;
-	ulong dw, max;
-	int ix, iy;
+	uchar *s, *d, *od;
+	ulong dw;
+	int ix, iy, k;
 
 	dw = Dx(atlas->m->r);
-	max = height * pitch;
-	for (iy = 0; iy < max; iy += pitch, y++){
-		s = pixels + iy;
-		d = atlas->m->data->bdata + (y * dw + x) * 4;
+	for(iy = 0; iy < height; iy++, y++){
+		s = pixels + iy*pitch;
+		od = d = byteaddr(atlas->m, Pt(x*scale, y*scale));
 
-		for (ix = 0; ix < width; ix++){
+		for(ix = 0; ix < width; ix++, s++)
+		for(k = 0; k < scale; k++){
 			*d++ = *s;
 			*d++ = *s;
 			*d++ = *s;
 			*d++ = 0xFF;
-			s++;
 		}
+
+		for(k = 1; k < scale; k++)
+			memcpy(byteaddr(atlas->m, Pt(x*scale, y*scale+k)), od, d - od);
 	}
 	atlas->dirty = 1;
 }
@@ -293,8 +268,8 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 	Rectangle r, cr;
 	Point p;
 
-	r = Rect(x, y, x+glyph_width, y+glyph_height);
-	p = Pt(glyph_x, glyph_y);
+	r = Rect(x*scale, y*scale, x*scale+glyph_width*scale, y*scale+glyph_height*scale);
+	p = Pt(glyph_x*scale, glyph_y*scale);
 	if(glyph_atlas->dirty){
 		cr = glyph_atlas->m->r;
 		freeimage(glyph_atlas->cache);
