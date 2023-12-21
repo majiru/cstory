@@ -8,6 +8,8 @@
 #include <string.h>
 #include <draw.h>
 #include <memdraw.h>
+#include <thread.h>
+#include <mouse.h>
 
 #include "../Misc.h"
 #include "Window/Software.h"
@@ -15,6 +17,9 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+static Channel *resizec;
+static Mousectl *mctl;
 
 typedef struct RenderBackend_Surface
 {
@@ -40,8 +45,42 @@ enum {
 	scale = 2,
 };
 
+static void RenderBackend_Mouseproc(void*)
+{
+	enum { Amouse, Aresize, Aout, Aend };
+	static int needgetwin;
+
+	Alt a[] = {
+		[Amouse] {  mctl->c, nil, CHANRCV },
+		[Aresize] { mctl->resizec, nil, CHANRCV },
+		[Aout] { resizec, &needgetwin, CHANSND },
+		[Aend] { nil, nil, CHANEND },
+	};
+
+	threadsetname("mouseproc");
+	for(;;){
+		switch(alt(a)){
+		case Aresize:
+			needgetwin = 1;
+			break;
+		case Aout:
+			needgetwin = 0;
+			break;
+		}
+	}
+}
+
 RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width, size_t height, int fullscreen)
 {
+	memimageinit();
+	if(initdraw(nil, nil, "cstory") < 0)
+		sysfatal("initdraw: %r");
+	resizec = chancreate(sizeof(int), 1);
+	mctl = initmouse(nil, screen);
+	if(mctl == nil)
+		sysfatal("initmouse: %r");
+	proccreate(RenderBackend_Mouseproc, nil, 8192);
+
 	framebuffer.i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DBlue);
 	if(framebuffer.i == nil)
 		sysfatal("could not alloc screen");
@@ -56,6 +95,11 @@ void RenderBackend_Deinit(void)
 
 void RenderBackend_DrawScreen(void)
 {
+	int needgetwin;
+
+	recv(resizec, &needgetwin);
+	if(needgetwin)
+		getwindow(display, Refnone);
 	draw(screen, screen->r, framebuffer.i, nil, ZP);
 	flushimage(display, 1);
 }

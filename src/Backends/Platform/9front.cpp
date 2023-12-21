@@ -9,10 +9,8 @@
 #include <draw.h>
 #include <memdraw.h>
 #include <keyboard.h>
-#include <mouse.h>
 
 static int keyboard_state[BACKEND_KEYBOARD_TOTAL];
-static Mousectl *mctl;
 
 int Mark_Rune(int *kbd, Rune r)
 {
@@ -128,43 +126,12 @@ void Key_Proc(void*)
 	}
 }
 
-void Backend_Proc(void*)
-{
-	enum { Aresize, Amouse, Aend };
-	Mouse m;
-
-	Alt a[] = {
-		[Amouse] { nil, &m, CHANRCV },
-		[Aresize] { nil, nil, CHANRCV },
-		[Aend] { nil, nil, CHANEND },
-	};
-	threadsetname("resizeproc");
-	a[Amouse].c = mctl->c;
-	a[Aresize].c = mctl->resizec;
-
-	for(;;){
-		switch(alt(a)){
-		case Aresize:
-			getwindow(display, Refnone);
-			break;
-		}
-	}
-}
-
 int Backend_Init(void (*drag_and_drop_callback)(const char *path), void (*window_focus_callback)(int focus))
 {
 	(void)drag_and_drop_callback;
 	(void)window_focus_callback;
 
-	memimageinit();
-	if(initdraw(nil, nil, "cstory") < 0)
-		sysfatal("initdraw: %r");
-	mctl = initmouse(nil, screen);
-	if(mctl == nil)
-		sysfatal("initmouse: %r");
-
 	proccreate(Key_Proc, nil, 8192);
-	proccreate(Backend_Proc, nil, 8192);
 
 	return 1;
 }
