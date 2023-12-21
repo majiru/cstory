@@ -75,6 +75,16 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width
 	memimageinit();
 	if(initdraw(nil, nil, "cstory") < 0)
 		sysfatal("initdraw: %r");
+	switch(screen->chan){
+	case XRGB32:
+	case ARGB32:
+		break;
+	default:
+		/* TODO? */
+		sysfatal("unsupported screen color channel");
+		return;
+	}
+
 	resizec = chancreate(sizeof(int), 1);
 	mctl = initmouse(nil, screen);
 	if(mctl == nil)
@@ -187,29 +197,17 @@ void RenderBackend_UploadSurface(RenderBackend_Surface *surface, const unsigned 
 	surface->dirty = 1;
 }
 
+enum {
+	maskmask = 0xFFFFFF,
+};
+
 void RenderBackend_CalcMask(RenderBackend_Surface *s)
 {
 	Memimage *m;
 	Rectangle r;
 	int x, y, w, h;
 	ulong *lp;
-	ulong mask;
 
-	switch(s->i->chan){
-	case XRGB32:
-	case ARGB32:
-	case XBGR32:
-	case ABGR32:
-		mask = 0xFFFFFF;
-		break;
-	case RGBA32:
-		mask = 0xFFFFFF00;
-		break;
-	default:
-		/* TODO? */
-		sysfatal("< 32 bit screen color channel");
-		return;
-	}
 	r = s->i->r;
 	w = Dx(r);
 	h = Dy(r);
@@ -218,7 +216,7 @@ void RenderBackend_CalcMask(RenderBackend_Surface *s)
 	for(y = 0; y < h; y++)
 	for(x = 0; x < w; x++){
 		lp = m->data->base + y*w + x;
-		if((*lp & mask) == 0)
+		if((*lp & maskmask) == 0)
 			*lp = 0x00;
 		else
 			*lp = 0xFFFFFFFF;
