@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-CFLAGS=-Fpw -I/sys/include/npe -I/sys/include/npe/SDL2 -D__plan9__ -D__${objtype}__ -DFIX_BUGS -DFIX_MAJOR_BUGS
+CFLAGS=-Fpw -I/sys/include/npe -D__plan9__ -D__${objtype}__ -DFIX_BUGS -DFIX_MAJOR_BUGS
 BIN=/$objtype/bin/games
 TARG=cstory
 
@@ -169,6 +169,7 @@ CLEANFILES=\
 
 $O.bin2h:	bin2h/bin2h.$O
 	$LD $LDFLAGS -o $target $prereq
+	mkdir -p src/Resource/^(BITMAP CURSOR ICON ORG WAVE)
 
 src/Resource/%.h:	$O.bin2h assets/resources/$stem
 	$O.bin2h assets/resources/$stem $target
