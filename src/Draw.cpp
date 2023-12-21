@@ -64,19 +64,20 @@ BOOL Flip_SystemTask(void)
 	// TODO - Not the original variable names
 	static unsigned long timePrev;
 	static unsigned long timeNow;
+	long x;
 
-	while (TRUE)
-	{
-		if (!SystemTask())
-			return FALSE;
+	if (!SystemTask())
+		return FALSE;
 
-		// Framerate limiter
-		timeNow = Backend_GetTicks();
+	// Framerate limiter
+	timeNow = Backend_GetTicks();
 
-		if (timeNow >= timePrev + 20)
-			break;
+	x = timeNow - (long)(timePrev + 20);
 
-		Backend_Delay(1);
+	// Running fast
+	if (x < 0){
+		x *= -1;
+		Backend_Delay(x);
 	}
 
 	if (timeNow >= timePrev + 100)
