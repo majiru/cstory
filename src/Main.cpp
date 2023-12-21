@@ -469,20 +469,20 @@ BOOL SystemTask(void)
 					gKey |= KEY_ITEM;
 					break;
 
-				case BACKEND_KEYBOARD_COMMA:
-					gKey |= KEY_ALT_LEFT;
-					break;
-
-				case BACKEND_KEYBOARD_PERIOD:
-					gKey |= KEY_ALT_DOWN;
-					break;
-
-				case BACKEND_KEYBOARD_FORWARD_SLASH:
-					gKey |= KEY_ALT_RIGHT;
-					break;
-
 				case BACKEND_KEYBOARD_L:
-					gKey |= KEY_L;
+					gKey |= KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_APOSTROPHE:
+					gKey |= KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_P:
+					gKey |= KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_SEMICOLON:
+					gKey |= KEY_DOWN;
 					break;
 
 				case BACKEND_KEYBOARD_EQUALS:
@@ -555,20 +555,20 @@ BOOL SystemTask(void)
 					gKey &= ~KEY_ITEM;
 					break;
 
-				case BACKEND_KEYBOARD_COMMA:
-					gKey &= ~KEY_ALT_LEFT;
-					break;
-
-				case BACKEND_KEYBOARD_PERIOD:
-					gKey &= ~KEY_ALT_DOWN;
-					break;
-
-				case BACKEND_KEYBOARD_FORWARD_SLASH:
-					gKey &= ~KEY_ALT_RIGHT;
-					break;
-
 				case BACKEND_KEYBOARD_L:
-					gKey &= ~KEY_L;
+					gKey &= ~KEY_LEFT;
+					break;
+
+				case BACKEND_KEYBOARD_APOSTROPHE:
+					gKey &= ~KEY_RIGHT;
+					break;
+
+				case BACKEND_KEYBOARD_P:
+					gKey &= ~KEY_UP;
+					break;
+
+				case BACKEND_KEYBOARD_SEMICOLON:
+					gKey &= ~KEY_DOWN;
 					break;
 
 				case BACKEND_KEYBOARD_EQUALS:
