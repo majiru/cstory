@@ -78,6 +78,8 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width
 	switch(screen->chan){
 	case XRGB32:
 	case ARGB32:
+	case XBGR32:
+	case ABGR32:
 		break;
 	default:
 		/* TODO? */
@@ -91,7 +93,7 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width
 		sysfatal("initmouse: %r");
 	proccreate(RenderBackend_Mouseproc, nil, 8192);
 
-	framebuffer.i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DBlue);
+	framebuffer.i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DNofill);
 	if(framebuffer.i == nil)
 		sysfatal("could not alloc screen");
 
@@ -123,7 +125,7 @@ RenderBackend_Surface* RenderBackend_CreateSurface(size_t width, size_t height, 
 	if (surface == NULL)
 		return NULL;
 
-	surface->i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DGreen);
+	surface->i = allocimage(display, Rect(0, 0, width*scale, height*scale), screen->chan, 0, DNofill);
 
 	return surface;
 }
@@ -156,7 +158,7 @@ void RenderBackend_UploadSurfaceScale(RenderBackend_Surface *surface, const unsi
 
 	r = Rect(0, 0, width*scale, 1);
 	r2 = Rect(0, 0, width*scale, scale);
-	row = allocimage(display, r, BGR24, 1, DYellow);
+	row = allocimage(display, r, BGR24, 1, DNofill);
 	buf = malloc(width*scale*3);
 
 	for(i = 0; i < height; i++){
@@ -212,7 +214,7 @@ void RenderBackend_CalcMask(RenderBackend_Surface *s)
 	w = Dx(r);
 	h = Dy(r);
 	m = allocmemimage(r, s->i->chan);
-	unloadimage(s->i, r, m->data->bdata, h*w*(s->i->depth/8));
+	unloadimage(s->i, r, m->data->bdata, h*w*4);
 	for(y = 0; y < h; y++)
 	for(x = 0; x < w; x++){
 		lp = m->data->base + y*w + x;
@@ -222,8 +224,8 @@ void RenderBackend_CalcMask(RenderBackend_Surface *s)
 			*lp = 0xFFFFFFFF;
 	}
 	freeimage(s->mask);
-	s->mask = allocimage(display, r, screen->chan, 0, DBlue);
-	loadimage(s->mask, r, m->data->bdata, h*w*(s->i->depth/8));
+	s->mask = allocimage(display, r, screen->chan, 0, DNofill);
+	loadimage(s->mask, r, m->data->bdata, h*w*4);
 	freememimage(m);
 	s->dirty = 0;
 }
@@ -318,8 +320,8 @@ void RenderBackend_DrawGlyph(long x, long y, size_t glyph_x, size_t glyph_y, siz
 	if(glyph_atlas->dirty){
 		cr = glyph_atlas->m->r;
 		freeimage(glyph_atlas->cache);
-		glyph_atlas->cache = allocimage(display, cr, screen->chan, 0, DYellow);
-		loadimage(glyph_atlas->cache, cr, glyph_atlas->m->data->bdata, Dx(cr)*Dy(cr)*(glyph_atlas->m->depth/8));
+		glyph_atlas->cache = allocimage(display, cr, screen->chan, 0, DNofill);
+		loadimage(glyph_atlas->cache, cr, glyph_atlas->m->data->bdata, Dx(cr)*Dy(cr)*4);
 		glyph_atlas->dirty = 0;
 	}
 	draw(glyph_destination_surface->i, r, glyph_atlas->color, glyph_atlas->cache, p);
