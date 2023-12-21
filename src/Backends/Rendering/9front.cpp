@@ -234,8 +234,11 @@ void RenderBackend_Blit(RenderBackend_Surface *source_surface, const RenderBacke
 {
 	Rectangle r, r2;
 
-	r = Rect(rect->left*scale, rect->top*scale, rect->right*scale, rect->bottom*scale);
-	r2 = Rect(x*scale, y*scale, (x*scale+Dx(r)), (y*scale+Dy(r)));
+	r.min = (Point){rect->left*scale, rect->top*scale};
+	r.max = (Point){rect->right*scale, rect->bottom*scale};
+
+	r2.min = (Point){x*scale, y*scale};
+	r2.max = (Point){x*scale+Dx(r), y*scale+Dy(r)};
 
 	if(colour_key && source_surface->dirty)
 		RenderBackend_CalcMask(source_surface);
