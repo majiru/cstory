@@ -207,26 +207,34 @@ void RenderBackend_CalcMask(RenderBackend_Surface *s)
 {
 	Memimage *m;
 	Rectangle r;
-	int x, y, w, h;
+	int x, y, w, h, loc, sh;
 	ulong *lp;
+	uchar *mask;
 
 	r = s->i->r;
 	w = Dx(r);
 	h = Dy(r);
 	m = allocmemimage(r, s->i->chan);
 	unloadimage(s->i, r, m->data->bdata, h*w*4);
+	mask = malloc(w*h/8);
+	memset(mask, 0, w*h/8);
 	for(y = 0; y < h; y++)
 	for(x = 0; x < w; x++){
-		lp = m->data->base + y*w + x;
+		loc = y*w + x;
+		lp = (ulong*)m->data->bdata;
+		lp += loc;
+		sh = loc % 8;
+		loc /= 8;
 		if((*lp & maskmask) == 0)
-			*lp = 0x00;
+			mask[loc] |= 0<<(7-sh);
 		else
-			*lp = 0xFFFFFFFF;
+			mask[loc] |= 1<<(7-sh);
 	}
 	freeimage(s->mask);
-	s->mask = allocimage(display, r, screen->chan, 0, DNofill);
-	loadimage(s->mask, r, m->data->bdata, h*w*4);
+	s->mask = allocimage(display, r, GREY1, 0, DNofill);
+	loadimage(s->mask, r, mask, h*w/8);
 	freememimage(m);
+	free(mask);
 	s->dirty = 0;
 }
 
