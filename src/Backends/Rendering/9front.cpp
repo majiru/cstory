@@ -75,17 +75,6 @@ RenderBackend_Surface* RenderBackend_Init(const char *window_title, size_t width
 	memimageinit();
 	if(initdraw(nil, nil, "cstory") < 0)
 		sysfatal("initdraw: %r");
-	switch(screen->chan){
-	case XRGB32:
-	case ARGB32:
-	case XBGR32:
-	case ABGR32:
-		break;
-	default:
-		/* TODO? */
-		sysfatal("unsupported screen color channel");
-		return;
-	}
 
 	resizec = chancreate(sizeof(int), 1);
 	mctl = initmouse(nil, screen);
