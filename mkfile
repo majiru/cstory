@@ -155,7 +155,8 @@ ASSETS=\
 
 CLEANFILES=\
 	$OFILES\
-	$O.bin2h\
+	$cputype.bin2h\
+	bin2h.$cputype\
 	bin2h/bin2h.$O\
 	$ASSETS\
 
@@ -167,12 +168,16 @@ CLEANFILES=\
 %.$O:	%.c
 	$CC $CFLAGS -o $stem.$O $stem.c
 
-$O.bin2h:	bin2h/bin2h.$O
+bin2h.$objtype:	bin2h/bin2h.$O
 	$LD $LDFLAGS -o $target $prereq
 	mkdir -p src/Resource/^(BITMAP CURSOR ICON ORG WAVE)
 
-src/Resource/%.h:	$O.bin2h assets/resources/$stem
-	$O.bin2h assets/resources/$stem $target
+$cputype.bin2h:
+	objtype=$cputype mk bin2h.$cputype
+	cp bin2h.$cputype $target
+
+src/Resource/%.h:	$cputype.bin2h assets/resources/$stem
+	$cputype.bin2h assets/resources/$stem $target
 
 src/Resource.$O:	$ASSETS
 
